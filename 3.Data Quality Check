@@ -1,0 +1,4 @@
+-- Updating wrong values
+UPDATE `platinum-lead-427306-p2.dl_layoffs.layoffs`
+SET COUNTRY = 'United States'
+WHERE COUNTRY = 'United States.'
