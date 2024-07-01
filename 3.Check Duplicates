@@ -1,0 +1,17 @@
+-- Check for duplicates:
+
+SELECT * FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+-- 2362 rows
+
+
+WITH REMOVE_DUPS AS(
+ SELECT *,
+ROW_NUMBER() OVER(PARTITION BY COMPANY,LOCATION,INDUSTRY,TOTAL_LAID_OFF,PERCENTAGE_LAID_OFF,DATE,STAGE,COUNTRY,FUNDS_RAISED_MILLIONS ORDER BY 1) AS ROW_NUM
+FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+QUALIFY ROW_NUM = 1
+)
+SELECT * 
+FROM REMOVE_DUPS
+
+-- 2357 rows
+-- so we can understand we had duplicated rows which were wrong and now they are removed.
