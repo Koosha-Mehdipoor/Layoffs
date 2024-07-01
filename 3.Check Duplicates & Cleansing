@@ -1,0 +1,34 @@
+-- Check for duplicates:
+
+SELECT * FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+-- 2362 rows
+
+
+WITH REMOVE_DUPS AS(
+ SELECT *,
+ROW_NUMBER() OVER(PARTITION BY COMPANY,LOCATION,INDUSTRY,TOTAL_LAID_OFF,PERCENTAGE_LAID_OFF,DATE,STAGE,COUNTRY,FUNDS_RAISED_MILLIONS ORDER BY 1) AS ROW_NUM
+FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+QUALIFY ROW_NUM = 1
+), CLEANING AS(
+
+SELECT 
+TRIM(company) AS COMPANY,
+TRIM(location) AS LOCATION,
+TRIM(industry) AS INDUSTRY,
+SAFE_CAST(total_laid_off AS INT64) AS TOTAL_LAID_OFF,
+SAFE_CAST(percentage_laid_off AS FLOAT64) AS PERCENTAGE_LAID_OFF,
+date AS ORGINIAL_DATE,
+SAFE.PARSE_DATE('%m/%d/%Y', date) AS DATE,
+TRIM(stage) AS STAGE,
+TRIM(country) AS COUNTRY,
+SAFE_CAST(funds_raised_millions AS FLOAT64) AS FUNDS_RAISED_MILLIONS
+FROM REMOVE_DUPS
+)
+SELECT *
+FROM CLEANING
+
+
+-- 2357 rows
+-- so we can understand we had duplicated rows which were wrong and now they are removed.
+-- we have changed the data types into the correct one
+
