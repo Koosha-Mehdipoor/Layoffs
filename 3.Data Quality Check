@@ -2,3 +2,7 @@
 UPDATE `platinum-lead-427306-p2.dl_layoffs.layoffs`
 SET COUNTRY = 'United States'
 WHERE COUNTRY = 'United States.'
+
+UPDATE `platinum-lead-427306-p2.dl_layoffs.layoffs`
+SET INDUSTRY = 'Crypto'
+WHERE INDUSTRY IN ('Crypto Currency','CryptoCurrency')
