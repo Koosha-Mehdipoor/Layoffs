@@ -6,3 +6,10 @@ WHERE COUNTRY = 'United States.'
 UPDATE `platinum-lead-427306-p2.dl_layoffs.layoffs`
 SET INDUSTRY = 'Crypto'
 WHERE INDUSTRY IN ('Crypto Currency','CryptoCurrency')
+
+
+
+-- Removing useless data
+DELETE FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+WHERE total_laid_off IS NULL
+AND percentage_laid_off IS NULL
