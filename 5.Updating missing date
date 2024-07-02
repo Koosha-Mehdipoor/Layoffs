@@ -1,0 +1,25 @@
+-- in bigquery if you use UPDATE FROM and do a self join to update industries, as in the source table there are duplicate company 
+--names you will receive this errro:
+--UPDATE/MERGE must match at most one source row for each target row
+
+
+
+
+MERGE `platinum-lead-427306-p2.dl_layoffs.layoffs` t1
+USING (
+  SELECT 
+    COMPANY, 
+    INDUSTRY 
+  FROM (
+    SELECT 
+      COMPANY, 
+      INDUSTRY, 
+      ROW_NUMBER() OVER (PARTITION BY COMPANY ORDER BY COMPANY) as rn
+    FROM `platinum-lead-427306-p2.dl_layoffs.layoffs`
+    WHERE INDUSTRY <> ''
+  )
+  WHERE rn = 1
+) t2
+ON t1.COMPANY = t2.COMPANY
+WHEN MATCHED AND t1.INDUSTRY = '' THEN
+UPDATE SET t1.INDUSTRY = t2.INDUSTRY;
