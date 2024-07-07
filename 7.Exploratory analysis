@@ -1,1 +1,107 @@
-7.
+-- what are the first 10 companies with the most layoffs:
+
+SELECT
+  COMPANY,
+  MAX(TOTAL_LAID_OFF) AS MAX_LAYOFF,
+  MAX(PERCENTAGE_LAID_OFF) AS MAX_LAYOFF_PERC
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+GROUP BY 1
+ORDER BY 2 desc
+LIMIT 10
+
+
+-- What are the first most impacted industries? (Removed "Other" becasue does not provide information at the moment)
+SELECT
+  INDUSTRY,
+  MAX(TOTAL_LAID_OFF) AS MAX_LAYOFF,
+  MAX(PERCENTAGE_LAID_OFF) AS MAX_LAYOFF_PERC
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+WHERE INDUSTRY <> 'Other'
+GROUP BY 1
+ORDER BY 2 desc
+LIMIT 10
+
+
+-- First 10 countreis mostly impacted by layoffs:
+
+SELECT
+  COUNTRY,
+  MAX(TOTAL_LAID_OFF) AS MAX_LAYOFF,
+  MAX(PERCENTAGE_LAID_OFF) AS MAX_LAYOFF_PERC
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+GROUP BY 1
+ORDER BY 2 desc
+LIMIT 10
+
+
+-- what is the timeframe of our dataset?
+
+SELECT
+  MAX(DATE) AS LAST_DATE,
+  MIN(DATE) AS FIRST_DATE
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+
+-- our data starts from March 2020 and ends in March 2023.
+
+-- In which year the most layoff happened? 
+
+SELECT
+EXTRACT(YEAR FROM DATE) AS YEAR,
+SUM(TOTAL_LAID_OFF) AS TOTAL_LAYOFF
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+GROUP BY 1
+ORDER BY 1
+
+-- we can see that the most layoff happend in 2022 but we shold consider that our data is not complete and in 3 months in 2023 we have 120,000 layoffs.
+
+--what is the situation of different countries in during these years?
+SELECT
+EXTRACT(YEAR FROM DATE) AS YEAR,
+COUNTRY,
+SUM(TOTAL_LAID_OFF) AS TOTAL_LAYOFF
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+WHERE DATE IS NOT NULL
+GROUP BY 1,2
+ORDER BY 2,1
+
+-- but we need to consider that for some countries the data of each three years is not available which for me means data is not availale rather they didn't have any layoffs.
+
+
+-- Which companies have done the most layoffs during different years? DENS_RANK() fubction here simply can help us
+
+WITH COMPANY_YEAR AS(
+SELECT
+EXTRACT(YEAR FROM DATE) AS YEAR,
+COMPANY,
+SUM(TOTAL_LAID_OFF) AS TOTAL_LAYOFF
+FROM
+  `platinum-lead-427306-p2.dl_layoffs.v_layoffs`
+WHERE DATE IS NOT NULL
+GROUP BY 1,2
+), RANKING AS(
+
+SELECT * ,
+DENSE_RANK() OVER(PARTITION BY YEAR ORDER BY TOTAL_LAYOFF DESC) AS RANK
+FROM COMPANY_YEAR
+WHERE TOTAL_LAYOFF IS NOT NULL
+ORDER BY RANK
+)
+
+SELECT *
+FROM RANKING
+WHERE RANK <= 5
+ORDER BY YEAR
+
+
+
+
+
+
+
+
