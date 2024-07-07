@@ -1,0 +1,4 @@
+-- There are 362 rows which both total and percentage layoff is null so they don't give us any info
+
+DELETE `platinum-lead-427306-p2.dl_layoffs.layoffs`
+WHERE total_laid_off = 'NULL' AND percentage_laid_off = 'NULL'
